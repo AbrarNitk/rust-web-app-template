@@ -1,18 +1,53 @@
-async fn http_main(name: &str) -> Result<(), Box<dyn std::error::Error + Sync + Send>> {
-    let mut count = 0;
-    loop {
-        println!("Thread {}, number: {}", name, count);
-        std::thread::sleep(std::time::Duration::from_secs(1));
-        count += 1;
+pub struct HttpService;
+
+impl hyper::service::Service<hyper::Request<hyper::Body>> for HttpService {
+    type Response = hyper::Response<hyper::Body>;
+    type Error = hyper::Error;
+    type Future = std::pin::Pin<
+        Box<dyn futures::Future<Output = Result<Self::Response, Self::Error>> + Send>,
+    >;
+
+    fn poll_ready(
+        &mut self,
+        _cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Result<(), Self::Error>> {
+        std::task::Poll::Ready(Ok(()))
     }
-    //Ok(())
+
+    fn call(&mut self, req: hyper::Request<hyper::Body>) -> Self::Future {
+        Box::pin(async {
+            println!("Hello World");
+            return Ok(hyper::Response::new(hyper::Body::from("hello world")));
+        })
+    }
+}
+
+async fn http_main() -> Result<(), Box<dyn std::error::Error + Sync + Send>> {
+    let socket_address: std::net::SocketAddr = ([0, 0, 0, 0], 8000).into();
+    let listener = tokio::net::TcpListener::bind(socket_address).await?;
+    println!(
+        "#### Started at: {}:{}",
+        socket_address.ip(),
+        socket_address.port()
+    );
+    loop {
+        let (tcp_stream, _) = listener.accept().await?;
+        tokio::task::spawn(async move {
+            if let Err(http_err) = hyper::server::conn::Http::new()
+                .serve_connection(tcp_stream, HttpService {})
+                .await
+            {
+                eprintln!("Error while serving HTTP connection: {}", http_err);
+            }
+        });
+    }
 }
 
 fn main() {
-    let rt = tokio::runtime::Builder::new_multi_thread()
-        //        .worker_threads(4)
+    tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()
+        .unwrap()
+        .block_on(http_main())
         .unwrap();
-    rt.block_on(http_main("1")).unwrap();
 }
