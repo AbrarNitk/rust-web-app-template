@@ -16,8 +16,13 @@ impl hyper::service::Service<hyper::Request<hyper::Body>> for HttpService {
 
     fn call(&mut self, req: hyper::Request<hyper::Body>) -> Self::Future {
         Box::pin(async {
-            println!("Hello World");
-            return Ok(hyper::Response::new(hyper::Body::from("hello world")));
+            match service::router::handler(req).await {
+                Ok(r) => Ok(r),
+                Err(_e) => {
+                    dbg!(_e);
+                    unimplemented!()
+                }
+            }
         })
     }
 }
