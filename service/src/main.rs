@@ -27,11 +27,23 @@ impl hyper::service::Service<hyper::Request<hyper::Body>> for HttpService {
     }
 }
 
+fn env() -> String {
+    match std::env::var("ENV") {
+        Ok(env) => env.to_lowercase().to_string(),
+        Err(_) => "local".to_string(),
+    }
+}
+
 async fn http_main() -> Result<(), Box<dyn std::error::Error + Sync + Send>> {
+    // Setting the environment variables
+    let env_path = format!("{}.env", env());
+    dotenv::from_path(env_path.as_str()).ok();
+    println!("Environment set: {}", env_path);
+    // Creating the tcp listener
     let socket_address: std::net::SocketAddr = ([0, 0, 0, 0], 8000).into();
     let listener = tokio::net::TcpListener::bind(socket_address).await?;
     println!(
-        "#### Started at: {}:{}",
+        "#### Started at: {}:{} ####",
         socket_address.ip(),
         socket_address.port()
     );
