@@ -39,6 +39,10 @@ async fn http_main() -> Result<(), Box<dyn std::error::Error + Sync + Send>> {
     let env_path = format!("{}.env", env());
     dotenv::from_path(env_path.as_str()).ok();
     println!("Environment set: {}", env_path);
+
+    // Initializing the database pool
+    db::pg::init_db_pool();
+
     // Creating the tcp listener
     let socket_address: std::net::SocketAddr = ([0, 0, 0, 0], 8000).into();
     let listener = tokio::net::TcpListener::bind(socket_address).await?;
