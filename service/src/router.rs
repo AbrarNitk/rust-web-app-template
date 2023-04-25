@@ -1,10 +1,11 @@
 pub async fn handler(
     req: hyper::Request<hyper::Body>,
-) -> Result<hyper::Response<hyper::Body>, http_service::errors::Error> {
+) -> Result<hyper::Response<hyper::Body>, http_service::errors::RouteError> {
     match (req.method(), req.uri().path()) {
         (&hyper::Method::GET, "/") => {
             let mut response = hyper::Response::new(hyper::Body::empty());
-            *response.body_mut() = hyper::Body::from("GET Response");
+            let resp = http_service::controller::get_user_profile()?;
+            *response.body_mut() = hyper::Body::from(serde_json::to_string(&resp)?);
             *response.status_mut() = hyper::StatusCode::OK;
             response.headers_mut().append(
                 hyper::header::CONTENT_TYPE,
