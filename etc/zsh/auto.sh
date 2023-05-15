@@ -1,4 +1,7 @@
 export PYTHONPATH=${PROJDIR}/dj
+export DATABASE_URL=postgres://fastn_cw:fastn_cw@127.0.0.1:5432/temp_db
+export DIESEL_CONFIG_FILE=${PROJDIR}/diesel.toml
+
 
 function pushd2() {
   PUSHED="$(pwd)"
@@ -55,4 +58,14 @@ function pyfmt() {
 
 function install_diesel() {
   cargo install diesel_cli --no-default-features --features "postgres"
+}
+
+function diesel_schema() {
+  (which diesel || install_diesel) >> /dev/null
+  diesel print-schema only-tables --database-url=$DATABASE_URL > $PROJDIR/service/db/src/schema.rs
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' -e 's/Varchar/Text/g' $PROJDIR/service/db/src/schema.rs
+  else
+    sed -i -e 's/Varchar/Text/g' $PROJDIR/service/db/src/schema.rs
+  fi
 }

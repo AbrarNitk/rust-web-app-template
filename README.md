@@ -58,3 +58,33 @@ mv proj dj
 
 
 ## Install `Redis`
+
+
+## Diesel Setup
+
+### Install Diesel CLI
+
+If above `zsh` setup is not done
+
+```shell
+cargo install diesel_cli --no-default-features --features "postgres"
+```
+
+If above `zsh` is done so run below command
+
+```shell
+install_diesel
+```
+
+### Diesel Schema
+
+If above `zsh` setup is not done
+```shell
+diesel print-schema only-tables --database-url=$DATABASE_URL > $PROJDIR/service/db/src/schema.rs
+```
+
+If above `zsh` is done so run below command
+
+```shell
+diesel_schema
+```
