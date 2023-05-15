@@ -34,6 +34,18 @@ function dbshell() {
   manage dbshell
 }
 
+function recreatedb() {
+  DATABASE_NAME=temp_db
+  ROLE_NAME=temp_user
+  PASSWORD=temp_pass
+  WHO=`whoami`
+  psql -h 127.0.0.1 -U "${WHO}" -d postgres -c "DROP ROLE IF EXISTS ${ROLE_NAME};"
+  psql -h 127.0.0.1 -U "${WHO}" -d postgres -c "CREATE ROLE ${ROLE_NAME} WITH SUPERUSER LOGIN PASSWORD '${PASSWORD}';"
+  psql -h 127.0.0.1 -U "${WHO}" -d postgres -c "DROP DATABASE IF EXISTS ${DATABASE_NAME};"
+  psql -h 127.0.0.1 -U "${WHO}" -d postgres -c "CREATE DATABASE ${DATABASE_NAME};"
+  migrate $*
+}
+
 function pyfmt() {
   pushd2 /dj
   black .

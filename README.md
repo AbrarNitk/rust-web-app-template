@@ -52,3 +52,9 @@ and it is already done
 django-admin startproject proj
 mv proj dj
 ```
+
+
+## Install Postgres
+
+
+## Install `Redis`
