@@ -69,3 +69,7 @@ function diesel_schema() {
     sed -i -e 's/Varchar/Text/g' $PROJDIR/service/db/src/schema.rs
   fi
 }
+
+function runserver() {
+  manage runserver 0.0.0.0:8001
+}

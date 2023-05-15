@@ -43,16 +43,35 @@ source ./.env/bin/activate
 pip install -r requirements.txt
 ```
 
-### Create Project
+### Create Django Project
 
-We don't need to run this command everytime as we have to create only first time
-and it is already done
+We don't need to run this command everytime as we have to create only first time, it is already done
 
 ```shell
 django-admin startproject proj
 mv proj dj
 ```
 
+### Create Django APP
+
+```shell
+cd dj
+django-admin startapp temp_app
+```
+
+Add this APP into dj/proj/settings.py in `INSTALLED_APPS`.
+
+```python
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "temp_app"
+]
+```
 
 ## Install Postgres
 
