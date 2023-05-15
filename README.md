@@ -1,5 +1,11 @@
 # Rust Web Service Template
 
+This repository contains a template for setting up Rust Web Development. 
+To handle database migrations, I have opted for Django due to its convenient 
+built-in functionality. For database ORM, I have used diesel. To facilitate 
+development, I have configured the CLI using zsh, which has been my go-to shell 
+for some time. For the HTTP service, I have chosen hyper due to its lightweight nature.
+
 
 ## Rust Setup
 
@@ -11,19 +17,52 @@
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
+## IDE Setup
+
+I have opted for PyCharm Community Edition for updating the Django Models and 
+IntelliJ IDEA Community Edition for Rust.
+
 
 ## Zsh Setup
 
 ### Install `zsh`
 
-### Autoenv Setup
-
-- https://github.com/Tarrasch/zsh-autoenv
+### For Mac
 
 ```shell
+
+# Installing the zsh
+brew install zsh
+
+# Setting the `zsh` as your default shell
+chsh -s /bin/zsh
+
+# After that restart your terminal, now you should be using `zsh` as your default shell
+```
+
+#### For Ubuntu and Debian-based Linux distributions
+
+
+```shell
+
+# Installing the zsh
+sudo apt install zsh
+
+# Setting the `zsh` as your default shell 
+chsh -s $(which zsh)
+
+# After that restart your terminal, now you should be using `zsh` as your default shell
+```
+
+
+### Autoenv Setup
+
+```shell
+mkdir ~/.dotfiles
 git clone https://github.com/Tarrasch/zsh-autoenv ~/.dotfiles/lib/zsh-autoenv
 echo 'source ~/.dotfiles/lib/zsh-autoenv/autoenv.zsh' >> ~/.zshrc
 ```
+- Reference: https://github.com/Tarrasch/zsh-autoenv
 
 
 ## Django Setup
