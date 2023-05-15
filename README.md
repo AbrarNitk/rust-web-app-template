@@ -42,3 +42,13 @@ source ./.env/bin/activate
 ```shell
 pip install -r requirements.txt
 ```
+
+### Create Project
+
+We don't need to run this command everytime as we have to create only first time
+and it is already done
+
+```shell
+django-admin startproject proj
+mv proj dj
+```
