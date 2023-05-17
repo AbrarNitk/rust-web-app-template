@@ -105,6 +105,10 @@ dependencies = [
  "r2d2",
  "r2d2_postgres",
  "r2d2_redis",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "thiserror",
 ]
 
 [[package]]

@@ -29,7 +29,7 @@ impl hyper::service::Service<hyper::Request<hyper::Body>> for HttpService {
 
 fn env() -> String {
     match std::env::var("ENV") {
-        Ok(env) => env.to_lowercase().to_string(),
+        Ok(env) => env.to_lowercase(),
         Err(_) => "local".to_string(),
     }
 }
