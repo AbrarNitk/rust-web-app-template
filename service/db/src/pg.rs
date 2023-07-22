@@ -10,6 +10,9 @@ pub fn init_db_pool() {
     DB_POOL
         .set(
             Pool::builder()
+                .max_size(10)
+                .idle_timeout(Some(std::time::Duration::from_secs(600)))
+                .connection_timeout(std::time::Duration::from_secs(30))
                 .build(connection_manager)
                 .expect("Error in creating connection pool"),
         )
