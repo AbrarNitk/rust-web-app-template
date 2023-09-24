@@ -4,13 +4,12 @@ static REDIS_POOL: once_cell::sync::OnceCell<Pool> = once_cell::sync::OnceCell::
 
 pub fn get_pool(redis_url: &str) -> Pool {
     let connection_manager = r2d2_redis::RedisConnectionManager::new(redis_url).unwrap();
-    let p = r2d2::Pool::builder()
+    r2d2::Pool::builder()
         .max_size(10)
         .idle_timeout(Some(std::time::Duration::from_secs(600)))
         .connection_timeout(std::time::Duration::from_secs(30))
         .build(connection_manager)
-        .expect("error in setting the redis pool");
-    p
+        .expect("error in setting the redis pool")
 }
 
 pub fn init_redis_pool() {
