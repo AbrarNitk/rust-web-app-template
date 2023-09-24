@@ -18,9 +18,8 @@ impl hyper::service::Service<hyper::Request<hyper::Body>> for HttpService {
         Box::pin(async {
             match service::router::handler(req).await {
                 Ok(r) => Ok(r),
-                Err(_e) => {
-                    dbg!(_e);
-                    // unimplemented!();
+                Err(e) => {
+                    tracing::error!(target = "ServerHandlerError", "Error: {}", e);
                     Ok(service::router::response(
                         serde_json::to_string(&serde_json::json!({
                             "success": false,
@@ -36,12 +35,11 @@ impl hyper::service::Service<hyper::Request<hyper::Body>> for HttpService {
 }
 
 
-
 async fn http_main() -> Result<(), Box<dyn std::error::Error + Sync + Send>> {
     // Setting the environment variables
     let env_path = format!("{}.env", service::utils::read_env());
     dotenv::from_path(env_path.as_str()).ok();
-    println!("Environment set: {}", env_path);
+    tracing::info!("Environment set: {}", env_path);
 
     // Initializing the database pool
     // db::pg::init_db_pool();
@@ -51,7 +49,7 @@ async fn http_main() -> Result<(), Box<dyn std::error::Error + Sync + Send>> {
     let port = service::utils::read_port_env();
     let socket_address: std::net::SocketAddr = ([0, 0, 0, 0], port).into();
     let listener = tokio::net::TcpListener::bind(socket_address).await?;
-    println!(
+    tracing::info!(
         "#### Started at: {}:{} ####",
         socket_address.ip(),
         socket_address.port()
@@ -73,7 +71,7 @@ async fn http_main() -> Result<(), Box<dyn std::error::Error + Sync + Send>> {
                 .serve_connection(tcp_stream, HttpService {})
                 .await
             {
-                eprintln!("Error while serving HTTP connection: {}", http_err);
+                tracing::error!("Error while serving HTTP connection: {}", http_err);
             }
         });
     }

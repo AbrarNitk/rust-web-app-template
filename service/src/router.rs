@@ -14,9 +14,9 @@ async fn from_body<T: serde::de::DeserializeOwned>(b: hyper::Body) -> Result<T, 
 pub async fn handler(
     req: hyper::Request<hyper::Body>,
 ) -> Result<hyper::Response<hyper::Body>, http_service::errors::RouteError> {
-    tracing::info!(target: "requests", method = req.method().as_str(), path = req.uri().path());
+    tracing::info!(target = "request", method = req.method().as_str(), path = req.uri().path());
     match (req.method(), req.uri().path()) {
-        (&hyper::Method::GET, "/") => {
+        (&hyper::Method::GET, "/api/health/") => {
             let mut response = hyper::Response::new(hyper::Body::empty());
             let resp = http_service::controller::get_user_profile()?;
             *response.body_mut() = hyper::Body::from(serde_json::to_string(&resp)?);
