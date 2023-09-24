@@ -4,7 +4,7 @@ impl hyper::service::Service<hyper::Request<hyper::Body>> for HttpService {
     type Response = hyper::Response<hyper::Body>;
     type Error = hyper::Error;
     type Future = std::pin::Pin<
-        Box<dyn futures::Future<Output = Result<Self::Response, Self::Error>> + Send>,
+        Box<dyn futures::Future<Output=Result<Self::Response, Self::Error>> + Send>,
     >;
 
     fn poll_ready(
@@ -20,23 +20,26 @@ impl hyper::service::Service<hyper::Request<hyper::Body>> for HttpService {
                 Ok(r) => Ok(r),
                 Err(_e) => {
                     dbg!(_e);
-                    unimplemented!()
+                    // unimplemented!();
+                    Ok(service::router::response(
+                        serde_json::to_string(&serde_json::json!({
+                            "success": false,
+                            "message": "INTERNAL_SERVER_ERROR"
+                        }))
+                            .expect(""),
+                        hyper::StatusCode::INTERNAL_SERVER_ERROR,
+                    ))
                 }
             }
         })
     }
 }
 
-fn env() -> String {
-    match std::env::var("ENV") {
-        Ok(env) => env.to_lowercase(),
-        Err(_) => "local".to_string(),
-    }
-}
+
 
 async fn http_main() -> Result<(), Box<dyn std::error::Error + Sync + Send>> {
     // Setting the environment variables
-    let env_path = format!("{}.env", env());
+    let env_path = format!("{}.env", service::utils::read_env());
     dotenv::from_path(env_path.as_str()).ok();
     println!("Environment set: {}", env_path);
 
@@ -45,7 +48,8 @@ async fn http_main() -> Result<(), Box<dyn std::error::Error + Sync + Send>> {
     // db::redis::init_redis_pool();
 
     // Creating the tcp listener
-    let socket_address: std::net::SocketAddr = ([0, 0, 0, 0], 8000).into();
+    let port = service::utils::read_port_env();
+    let socket_address: std::net::SocketAddr = ([0, 0, 0, 0], port).into();
     let listener = tokio::net::TcpListener::bind(socket_address).await?;
     println!(
         "#### Started at: {}:{} ####",
