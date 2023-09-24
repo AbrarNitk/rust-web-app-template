@@ -79,11 +79,45 @@ async fn http_main() -> Result<(), Box<dyn std::error::Error + Sync + Send>> {
     }
 }
 
+async fn http_main_wrapper() {
+    http_main().await.expect("service error")
+}
+
+async fn traced_main() {
+    use tracing_subscriber::layer::SubscriberExt;
+    let level = std::env::var("TRACING")
+        .unwrap_or_else(|_| "info".to_owned())
+        .parse::<tracing_forest::util::LevelFilter>()
+        .unwrap_or(tracing_forest::util::LevelFilter::INFO);
+
+    if service::utils::is_traced() {
+        tracing_forest::worker_task()
+            .set_global(true)
+            .build_with(|_layer: tracing_forest::ForestLayer<_, _>| {
+                tracing_subscriber::Registry::default()
+                    .with(tracing_forest::ForestLayer::default())
+                    .with(level)
+            })
+            .on(http_main_wrapper())
+            .await
+    } else {
+        tracing_forest::worker_task()
+            .set_global(true)
+            .build_with(|_layer: tracing_forest::ForestLayer<_, _>| {
+                tracing_subscriber::FmtSubscriber::default().with(level)
+                // tracing_subscriber::Registry::default()
+                //     .with()
+                //     .with(level)
+            })
+            .on(http_main_wrapper())
+            .await
+    }
+}
+
 fn main() {
     tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()
         .unwrap()
-        .block_on(http_main())
-        .unwrap();
+        .block_on(traced_main())
 }

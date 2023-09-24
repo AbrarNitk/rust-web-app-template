@@ -13,3 +13,7 @@ pub fn read_port_env() -> u16 {
 
     port.parse().expect(format!("cannot parse port: {port}").as_str())
 }
+
+pub fn is_traced() -> bool {
+    std::env::var("TRACING").is_ok() || std::env::args().any(|e| e == "--trace")
+}
