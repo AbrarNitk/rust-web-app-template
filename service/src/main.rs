@@ -41,8 +41,8 @@ async fn http_main() -> Result<(), Box<dyn std::error::Error + Sync + Send>> {
     println!("Environment set: {}", env_path);
 
     // Initializing the database pool
-    db::pg::init_db_pool();
-    db::redis::init_redis_pool();
+    // db::pg::init_db_pool();
+    // db::redis::init_redis_pool();
 
     // Creating the tcp listener
     let socket_address: std::net::SocketAddr = ([0, 0, 0, 0], 8000).into();
@@ -52,6 +52,16 @@ async fn http_main() -> Result<(), Box<dyn std::error::Error + Sync + Send>> {
         socket_address.ip(),
         socket_address.port()
     );
+
+    // if needed so get the pool and send it to the `HttpService`
+    // Database pool
+    // let db_url = std::env::var("DATABASE_URL").expect("DATABASE_URL env var not found");
+    // let db_pool = db::pg::get_connection_pool(db_url.as_str());
+
+    // Redis pool
+    // let redis_url = std::env::var("REDIS_URL").expect("REDIS_URL env var not found");
+    // let redis_pool = db::redis::get_pool(redis_url.as_str());
+
     loop {
         let (tcp_stream, _) = listener.accept().await?;
         tokio::task::spawn(async move {
