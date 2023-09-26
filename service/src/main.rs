@@ -23,7 +23,9 @@ impl hyper::service::Service<hyper::Request<hyper::Body>> for HttpService {
                     Ok(service::router::response(
                         serde_json::to_string(&serde_json::json!({
                             "success": false,
-                            "message": "INTERNAL_SERVER_ERROR"
+                            "error": {
+                                "status": "INTERNAL_SERVER_ERROR"
+                            }
                         }))
                             .expect(""),
                         hyper::StatusCode::INTERNAL_SERVER_ERROR,
