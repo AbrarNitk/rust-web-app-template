@@ -10,8 +10,7 @@ pub fn read_port_env() -> u16 {
         Ok(env) => env.to_lowercase(),
         Err(_) => "8000".to_string(),
     };
-
-    port.parse().expect(format!("cannot parse port: {port}").as_str())
+    port.parse().unwrap_or_else(|_| panic!("cannot parse port: {port}"))
 }
 
 pub fn is_traced() -> bool {

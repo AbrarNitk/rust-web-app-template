@@ -6,7 +6,7 @@ pub enum BodyError {
     SerdeDeserialize(#[from] serde_json::Error),
 }
 
-async fn from_body<T: serde::de::DeserializeOwned>(b: hyper::Body) -> Result<T, BodyError> {
+pub async fn from_body<T: serde::de::DeserializeOwned>(b: hyper::Body) -> Result<T, BodyError> {
     let b = hyper::body::to_bytes(b).await?;
     Ok(serde_json::from_slice(b.as_ref())?)
 }
@@ -37,7 +37,15 @@ pub async fn handler(
             );
             Ok(response)
         }
-        _ => todo!(),
+        _ => {
+            Ok(response(serde_json::to_string(&serde_json::json!({
+                "success": false,
+                "error": {
+                    "status": "NOT_FOUND",
+                    "path": req.uri().path()
+                }
+            })).unwrap(), hyper::StatusCode::NOT_FOUND))
+        }
     }
 }
 
